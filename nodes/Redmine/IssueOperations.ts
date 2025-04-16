@@ -208,6 +208,32 @@ export const issueFields: INodeProperties[] = [
         description: 'Whether to filter issues by creation date',
       },
       {
+        displayName: 'Created On (Range) End',
+        name: 'creationDateEnd',
+        type: 'dateTime',
+        displayOptions: {
+          show: {
+            filterByCreationDate: [true],
+            creationDateFilterType: ['range'],
+          },
+        },
+        default: '',
+        description: 'End date of the range',
+      },
+      {
+        displayName: 'Created On (Range) Start',
+        name: 'creationDateStart',
+        type: 'dateTime',
+        displayOptions: {
+          show: {
+              filterByCreationDate: [true],
+              creationDateFilterType: ['range'],
+          },
+        },
+        default: '',
+        description: 'Start date of the range',
+      },
+      {
         displayName: 'Created On Filter Type',
         name: 'creationDateFilterType',
         type: 'options',
@@ -249,33 +275,7 @@ export const issueFields: INodeProperties[] = [
         },
         default: '',
         description: 'The date to filter by',
-      },
-      {
-        displayName: 'Created On (Range) Start',
-        name: 'creationDateStart',
-        type: 'dateTime',
-        displayOptions: {
-          show: {
-              filterByCreationDate: [true],
-              creationDateFilterType: ['range'],
-          },
-        },
-        default: '',
-        description: 'Start date of the range',
-      },
-      {
-        displayName: 'Created On (Range) End',
-        name: 'creationDateEnd',
-        type: 'dateTime',
-        displayOptions: {
-          show: {
-            filterByCreationDate: [true],
-            creationDateFilterType: ['range'],
-          },
-        },
-        default: '',
-        description: 'End date of the range',
-      },     
+      },      
       {
         displayName: 'Custom Fields',
         name: 'customFields',
@@ -422,6 +422,32 @@ export const issueFields: INodeProperties[] = [
         description: 'Whether to filter issues by updated date',
       },
       {
+        displayName: 'Updated On (Range) End',
+        name: 'updatedDateEnd',
+        type: 'dateTime',
+        displayOptions: {
+          show: {
+            filterByUpdatedDate: [true],
+            updatedDateFilterType: ['range'],
+          },
+        },
+        default: '',
+        description: 'End date of the range',
+      },
+      {
+        displayName: 'Updated On (Range) Start',
+        name: 'updatedDateStart',
+        type: 'dateTime',
+        displayOptions: {
+          show: {
+              filterByUpdatedDate: [true],
+              updatedDateFilterType: ['range'],
+          },
+        },
+        default: '',
+        description: 'Start date of the range',
+      },
+      {
         displayName: 'Updated On Filter Type',
         name: 'updatedDateFilterType',
         type: 'options',
@@ -463,32 +489,6 @@ export const issueFields: INodeProperties[] = [
         },
         default: '',
         description: 'The date to filter by',
-      },
-      {
-        displayName: 'Updated On (Range) Start',
-        name: 'updatedDateStart',
-        type: 'dateTime',
-        displayOptions: {
-          show: {
-              filterByUpdatedDate: [true],
-              updatedDateFilterType: ['range'],
-          },
-        },
-        default: '',
-        description: 'Start date of the range',
-      },
-      {
-        displayName: 'Updated On (Range) End',
-        name: 'updatedDateEnd',
-        type: 'dateTime',
-        displayOptions: {
-          show: {
-            filterByUpdatedDate: [true],
-            updatedDateFilterType: ['range'],
-          },
-        },
-        default: '',
-        description: 'End date of the range',
       },
     ],
   },
