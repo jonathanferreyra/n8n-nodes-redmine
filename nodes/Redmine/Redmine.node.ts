@@ -3,7 +3,7 @@ import {
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
-  NodeConnectionType,
+  NodeConnectionType
 } from 'n8n-workflow';
 
 import { issueOperations, issueFields } from './IssueOperations';
@@ -25,8 +25,8 @@ export class Redmine implements INodeType {
     defaults: {
       name: 'Redmine',
     },
-    inputs: ['main'],
-    outputs: ['main'],
+    inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
     credentials: [
       {
         name: 'redmineApi',
