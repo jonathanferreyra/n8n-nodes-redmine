@@ -59,6 +59,7 @@ Manage issues in your Redmine projects.
     - Subject: The subject/title of the issue
   - Additional fields:
     - Assigned To ID
+    - Category ID
     - Description
     - Due Date
     - Estimated Hours
