@@ -542,6 +542,13 @@ export const issueFields: INodeProperties[] = [
         description: 'The ID of the user to assign the issue to',
       },
       {
+        displayName: 'Category ID',
+        name: 'category_id',
+        type: 'string',
+        default: '',
+        description: 'The category ID of the issue',
+      },
+      {
         displayName: 'Custom Fields',
         name: 'customFields',
         placeholder: 'Add Custom Field',
@@ -579,6 +586,9 @@ export const issueFields: INodeProperties[] = [
         type: 'string',
         default: '',
         description: 'The description of the issue',
+        typeOptions: {
+          rows: 4,
+        },
       },
       {
         displayName: 'Due Date',

@@ -188,6 +188,7 @@ export async function executeIssueOperation(
     const subject = this.getNodeParameter('subject', i) as string;
     const additionalFields = this.getNodeParameter('additionalFields', i) as {
       description?: string;
+      category_id?: string;
       status_id?: string;
       tracker_id?: string;
       priority_id?: string;
@@ -214,6 +215,7 @@ export async function executeIssueOperation(
     
     // Add all additional fields to the request
     if (additionalFields.description) issueData.description = additionalFields.description;
+    if (additionalFields.category_id) issueData.category_id = additionalFields.category_id;
     if (additionalFields.status_id) issueData.status_id = additionalFields.status_id;
     if (additionalFields.tracker_id) issueData.tracker_id = additionalFields.tracker_id;
     if (additionalFields.priority_id) issueData.priority_id = additionalFields.priority_id;
@@ -249,6 +251,7 @@ export async function executeIssueOperation(
     const issueId = this.getNodeParameter('issueId', i) as string;
     const additionalFields = this.getNodeParameter('additionalFields', i) as {
       description?: string;
+      category_id?: string;
       status_id?: string;
       tracker_id?: string;
       priority_id?: string;
@@ -272,6 +275,7 @@ export async function executeIssueOperation(
     
     // Add all additional fields to the request
     if (additionalFields.description) issueData.description = additionalFields.description;
+    if (additionalFields.category_id) issueData.category_id = additionalFields.category_id;
     if (additionalFields.status_id) issueData.status_id = additionalFields.status_id;
     if (additionalFields.tracker_id) issueData.tracker_id = additionalFields.tracker_id;
     if (additionalFields.priority_id) issueData.priority_id = additionalFields.priority_id;

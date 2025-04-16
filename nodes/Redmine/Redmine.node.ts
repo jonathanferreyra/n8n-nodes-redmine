@@ -25,8 +25,8 @@ export class Redmine implements INodeType {
     defaults: {
       name: 'Redmine',
     },
-    inputs: [NodeConnectionType.Main],
-    outputs: [NodeConnectionType.Main],
+    inputs: ['main'],
+    outputs: ['main'],
     credentials: [
       {
         name: 'redmineApi',
