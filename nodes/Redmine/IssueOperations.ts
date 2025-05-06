@@ -98,6 +98,47 @@ export const issueFields: INodeProperties[] = [
     description: 'The subject of the issue',
   },
   {
+    displayName: 'Subject',
+    name: 'subject',
+    type: 'string',
+    required: false,
+    displayOptions: {
+      show: {
+        resource: ['issue'],
+        operation: ['update'],
+      },
+    },
+    default: '',
+    description: 'The new subject of the issue. If blank, the subject will not be changed.',
+  },
+  {
+    displayName: 'Notes',
+    name: 'notes',
+    type: 'string',
+    required: false,
+    displayOptions: {
+      show: {
+        resource: ['issue'],
+        operation: ['update'],
+      },
+    },
+    default: '',
+    description: 'Comments about the update',
+  },
+  {
+    displayName: 'Private notes',
+    name: 'private_notes',
+    type: 'boolean',
+    displayOptions: {
+      show: {
+        resource: ['issue'],
+        operation: ['update'],
+      },
+    },
+    default: false,
+    description: 'Whether to create private notes',
+  },
+  {
     displayName: 'Additional Fields',
     name: 'additionalFields',
     type: 'collection',

@@ -251,6 +251,9 @@ export async function executeIssueOperation(
     //         issue:update
     // ----------------------------------
     const issueId = this.getNodeParameter('issueId', i) as string;
+    const subject = this.getNodeParameter('subject', i) as string;
+    const notes = this.getNodeParameter('notes', i) as string;
+    const privateNotes = this.getNodeParameter('private_notes', i) as string;
     const additionalFields = this.getNodeParameter('additionalFields', i) as {
       description?: string;
       category_id?: string;
@@ -276,6 +279,10 @@ export async function executeIssueOperation(
     
     const issueData: any = {};
     
+    if (subject) issueData.subject = subject;
+    if (notes) issueData.notes = notes;
+    if (privateNotes) issueData.private_notes = true;
+
     // Add all additional fields to the request
     if (additionalFields.description) issueData.description = additionalFields.description;
     if (additionalFields.category_id) issueData.category_id = additionalFields.category_id;
