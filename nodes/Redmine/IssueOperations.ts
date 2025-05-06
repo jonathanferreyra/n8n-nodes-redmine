@@ -101,7 +101,6 @@ export const issueFields: INodeProperties[] = [
     displayName: 'Subject',
     name: 'subject',
     type: 'string',
-    required: false,
     displayOptions: {
       show: {
         resource: ['issue'],
@@ -115,7 +114,6 @@ export const issueFields: INodeProperties[] = [
     displayName: 'Notes',
     name: 'notes',
     type: 'string',
-    required: false,
     displayOptions: {
       show: {
         resource: ['issue'],
@@ -126,7 +124,7 @@ export const issueFields: INodeProperties[] = [
     description: 'Comments about the update',
   },
   {
-    displayName: 'Private notes',
+    displayName: 'Private Notes',
     name: 'private_notes',
     type: 'boolean',
     displayOptions: {
