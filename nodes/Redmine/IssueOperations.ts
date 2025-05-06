@@ -605,6 +605,13 @@ export const issueFields: INodeProperties[] = [
         description: 'The estimated hours for the issue',
       },
       {
+        displayName: 'Fixed Version ID',
+        name: 'fixed_version_id',
+        type: 'string',
+        default: '',
+        description: 'The fixed version ID of the issue. Also known as Target Version ID.',
+      },
+      {
         displayName: 'Parent Issue ID',
         name: 'parent_issue_id',
         type: 'string',
