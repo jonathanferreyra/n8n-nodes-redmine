@@ -193,6 +193,7 @@ export async function executeIssueOperation(
       tracker_id?: string;
       priority_id?: string;
       assigned_to_id?: string;
+      fixed_version_id?: string;
       parent_issue_id?: string;
       start_date?: string;
       due_date?: string;
@@ -221,6 +222,7 @@ export async function executeIssueOperation(
     if (additionalFields.priority_id) issueData.priority_id = additionalFields.priority_id;
     if (additionalFields.assigned_to_id) issueData.assigned_to_id = additionalFields.assigned_to_id;
     if (additionalFields.parent_issue_id) issueData.parent_issue_id = additionalFields.parent_issue_id;
+    if (additionalFields.fixed_version_id) issueData.fixed_version_id = additionalFields.fixed_version_id;
     if (additionalFields.start_date) issueData.start_date = additionalFields.start_date;
     if (additionalFields.due_date) issueData.due_date = additionalFields.due_date;
     if (additionalFields.estimated_hours) issueData.estimated_hours = additionalFields.estimated_hours;
@@ -257,6 +259,7 @@ export async function executeIssueOperation(
       priority_id?: string;
       assigned_to_id?: string;
       parent_issue_id?: string;
+      fixed_version_id?: string;
       start_date?: string;
       due_date?: string;
       estimated_hours?: number;
@@ -281,6 +284,7 @@ export async function executeIssueOperation(
     if (additionalFields.priority_id) issueData.priority_id = additionalFields.priority_id;
     if (additionalFields.assigned_to_id) issueData.assigned_to_id = additionalFields.assigned_to_id;
     if (additionalFields.parent_issue_id) issueData.parent_issue_id = additionalFields.parent_issue_id;
+    if (additionalFields.fixed_version_id) issueData.fixed_version_id = additionalFields.fixed_version_id;
     if (additionalFields.start_date) issueData.start_date = additionalFields.start_date;
     if (additionalFields.due_date) issueData.due_date = additionalFields.due_date;
     if (additionalFields.estimated_hours) issueData.estimated_hours = additionalFields.estimated_hours;
