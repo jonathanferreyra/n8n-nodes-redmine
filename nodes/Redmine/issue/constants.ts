@@ -1,5 +1,3 @@
-import { INodeProperties } from 'n8n-workflow';
-
 export const ISSUE_INCLUDE_OPTIONS = [
   {
     name: 'Attachments',
@@ -7,7 +5,7 @@ export const ISSUE_INCLUDE_OPTIONS = [
     description: 'Include attachments (Since Redmine 3.4.0)',
   },
   {
-    name: 'Allowed statuses',
+    name: 'Allowed Statuses',
     value: 'allowed_statuses',
     description: 'Include the available allowed statuses (Since Redmine 5.0.x)',
   },
