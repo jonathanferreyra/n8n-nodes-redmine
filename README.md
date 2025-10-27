@@ -27,6 +27,8 @@ Manage issues in your Redmine projects.
 - **Get**: Retrieve a single issue by ID
   - Required parameters:
     - Issue ID
+  - Additional fields:
+    - Includes
   
 - **Get Many**: Retrieve multiple issues with filtering options
   - Parameters:
