@@ -31,6 +31,12 @@ export async function executeIssueOperation(
     const issueId = this.getNodeParameter('issueId', i) as string;
     method = 'GET';
     endpoint = `/issues/${issueId}.json`;
+
+    // Handle include parameter for associated data
+    const include = this.getNodeParameter('include', i, []) as string[];
+    if (include.length > 0) {
+      qs.include = include.join(',');
+    }
   } else if (operation === 'getAll') {
     // ----------------------------------
     //         issue:getAll
