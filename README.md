@@ -167,6 +167,8 @@ Manage users in your Redmine instance.
   - Required parameters:
     - User ID
 
+**Note**: All operations support User Impersonation via the 'Impersonate User' field. This requires the API key to be from an admin user.
+
 ## Contributing
 
 Feel free to submit issues, feature requests, and contributions via GitHub.

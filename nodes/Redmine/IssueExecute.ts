@@ -18,7 +18,7 @@ export async function executeIssueOperation(
   params: IssueOperationParams
 ): Promise<INodeExecutionData> {
   const { operation, i, baseUrl, apiKey } = params;
-  
+
   let endpoint: string = '';
   let method: IHttpRequestMethods = 'GET';
   let body: any = {};
@@ -42,10 +42,10 @@ export async function executeIssueOperation(
     //         issue:getAll
     // ----------------------------------
     const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-    
+
     method = 'GET';
     endpoint = '/issues.json';
-    
+
     // Handle pagination parameters
     if (!returnAll) {
       const limit = this.getNodeParameter('limit', i) as number;
@@ -53,19 +53,19 @@ export async function executeIssueOperation(
       qs.limit = limit;
       qs.offset = offset;
     }
-    
+
     // Handle sort parameter
     const sort = this.getNodeParameter('sort', i, '') as string;
     if (sort) {
       qs.sort = sort;
     }
-    
+
     // Handle include parameter for associated data
     const include = this.getNodeParameter('include', i, []) as string[];
     if (include.length > 0) {
       qs.include = include.join(',');
     }
-    
+
     // Get and process all filters
     const filters = this.getNodeParameter('filters', i, {}) as {
       issue_id?: string;
@@ -99,13 +99,13 @@ export async function executeIssueOperation(
         }[];
       };
     };
-    
+
     // Add standard filters to query string
     if (filters.issue_id) qs.issue_id = filters.issue_id;
     if (filters.project_id) qs.project_id = filters.project_id;
     if (filters.subproject_id) qs.subproject_id = filters.subproject_id;
     if (filters.tracker_id) qs.tracker_id = filters.tracker_id;
-    
+
     // Handle status_id with special options
     if (filters.status_id) {
       if (filters.status_id === 'custom' && filters.custom_status_id) {
@@ -114,7 +114,7 @@ export async function executeIssueOperation(
         qs.status_id = filters.status_id;
       }
     }
-    
+
     if (filters.assigned_to_id) qs.assigned_to_id = filters.assigned_to_id;
     if (filters.parent_id) qs.parent_id = filters.parent_id;
     if (filters.author_id) qs.author_id = filters.author_id;
@@ -127,7 +127,7 @@ export async function executeIssueOperation(
     // Process created_on date filter
     if (filters.filterByCreationDate) {
       const filterType = filters.creationDateFilterType as string;
-      
+
       switch (filterType) {
         case 'exact':
           if (filters.creationDate) {
@@ -155,7 +155,7 @@ export async function executeIssueOperation(
     // Process updated_on date filter
     if (filters.filterByUpdatedDate) {
       const filterType = filters.updatedDateFilterType as string;
-      
+
       switch (filterType) {
         case 'exact':
           if (filters.updatedDate) {
@@ -179,7 +179,7 @@ export async function executeIssueOperation(
           break;
       }
     }
-    
+
     // Process custom fields
     if (filters.customFields && filters.customFields.field) {
       for (const customField of filters.customFields.field) {
@@ -211,15 +211,15 @@ export async function executeIssueOperation(
         }[];
       };
     };
-    
+
     method = 'POST';
     endpoint = '/issues.json';
-    
+
     const issueData: any = {
       project_id: projectId,
       subject,
     };
-    
+
     // Add all additional fields to the request
     if (additionalFields.description) issueData.description = additionalFields.description;
     if (additionalFields.category_id) issueData.category_id = additionalFields.category_id;
@@ -232,23 +232,23 @@ export async function executeIssueOperation(
     if (additionalFields.start_date) issueData.start_date = additionalFields.start_date;
     if (additionalFields.due_date) issueData.due_date = additionalFields.due_date;
     if (additionalFields.estimated_hours) issueData.estimated_hours = additionalFields.estimated_hours;
-    
+
     // Add custom fields if any
     if (additionalFields.customFields && additionalFields.customFields.field) {
       const customFields: any[] = [];
-      
+
       for (const customField of additionalFields.customFields.field) {
         customFields.push({
           id: customField.id,
           value: customField.value,
         });
       }
-      
+
       if (customFields.length > 0) {
         issueData.custom_fields = customFields;
       }
     }
-    
+
     body = {
       issue: issueData,
     };
@@ -279,12 +279,12 @@ export async function executeIssueOperation(
         }[];
       };
     };
-    
+
     method = 'PUT';
     endpoint = `/issues/${issueId}.json`;
-    
+
     const issueData: any = {};
-    
+
     if (subject) issueData.subject = subject;
     if (notes) issueData.notes = notes;
     if (privateNotes) issueData.private_notes = true;
@@ -301,23 +301,23 @@ export async function executeIssueOperation(
     if (additionalFields.start_date) issueData.start_date = additionalFields.start_date;
     if (additionalFields.due_date) issueData.due_date = additionalFields.due_date;
     if (additionalFields.estimated_hours) issueData.estimated_hours = additionalFields.estimated_hours;
-    
+
     // Add custom fields if any
     if (additionalFields.customFields && additionalFields.customFields.field) {
       const customFields: any[] = [];
-      
+
       for (const customField of additionalFields.customFields.field) {
         customFields.push({
           id: customField.id,
           value: customField.value,
         });
       }
-      
+
       if (customFields.length > 0) {
         issueData.custom_fields = customFields;
       }
     }
-    
+
     body = {
       issue: issueData,
     };
@@ -329,32 +329,41 @@ export async function executeIssueOperation(
     method = 'DELETE';
     endpoint = `/issues/${issueId}.json`;
   }
-  
+
+  const optionsData = this.getNodeParameter('options', i, {}) as { impersonateUser?: string };
+  const impersonateUser = optionsData.impersonateUser;
+
+  const headers: any = {
+    'X-Redmine-API-Key': apiKey,
+    'Content-Type': 'application/json',
+  };
+
+  if (impersonateUser) {
+    headers['X-Redmine-Switch-User'] = impersonateUser;
+  }
+
   // Make the request to Redmine API
   const options: IRequestOptions = {
     method,
     body,
     qs,
     uri: `${baseUrl}/` + endpoint.replace(/^\//, ''),
-    headers: {
-      'X-Redmine-API-Key': apiKey,
-      'Content-Type': 'application/json',
-    },
+    headers,
     json: true,
   };
-  
+
   if (Object.keys(body).length === 0) {
     delete options.body;
   }
-  
+
   let responseData;
-  
+
   try {
     responseData = await this.helpers.request(options);
   } catch (error) {
     throw new NodeOperationError(this.getNode(), `Redmine API error: ${error.message}`, { itemIndex: i });
   }
-  
+
   return {
     json: responseData,
     pairedItem: {

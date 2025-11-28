@@ -18,7 +18,7 @@ export async function executeUserOperation(
   params: UserOperationParams
 ): Promise<INodeExecutionData> {
   const { operation, i, baseUrl, apiKey } = params;
-  
+
   let endpoint: string = '';
   let method: IHttpRequestMethods = 'GET';
   let body: any = {};
@@ -49,15 +49,15 @@ export async function executeUserOperation(
       name?: string;
       status?: string;
     };
-    
+
     method = 'GET';
     endpoint = '/users.json';
-    
+
     // Add filters to query string
     if (filters.group_id) qs.group_id = filters.group_id;
     if (filters.name) qs.name = filters.name;
     if (filters.status) qs.status = filters.status;
-    
+
     if (!returnAll) {
       const limit = this.getNodeParameter('limit', i) as number;
       qs.limit = limit;
@@ -84,10 +84,10 @@ export async function executeUserOperation(
         }[];
       };
     };
-    
+
     method = 'POST';
     endpoint = '/users.json';
-    
+
     const userData: any = {
       login,
       firstname,
@@ -95,30 +95,30 @@ export async function executeUserOperation(
       mail,
       password,
     };
-    
+
     // Add all additional fields to the request
     if (additionalFields.admin !== undefined) userData.admin = additionalFields.admin;
     if (additionalFields.auth_source_id) userData.auth_source_id = additionalFields.auth_source_id;
     if (additionalFields.mail_notification) userData.mail_notification = additionalFields.mail_notification;
     if (additionalFields.must_change_passwd !== undefined) userData.must_change_passwd = additionalFields.must_change_passwd;
     if (additionalFields.status) userData.status = additionalFields.status;
-    
+
     // Add custom fields if any
     if (additionalFields.customFields && additionalFields.customFields.field) {
       const customFields: any[] = [];
-      
+
       for (const customField of additionalFields.customFields.field) {
         customFields.push({
           id: customField.id,
           value: customField.value,
         });
       }
-      
+
       if (customFields.length > 0) {
         userData.custom_fields = customFields;
       }
     }
-    
+
     body = {
       user: userData,
     };
@@ -140,35 +140,35 @@ export async function executeUserOperation(
         }[];
       };
     };
-    
+
     method = 'PUT';
     endpoint = `/users/${userId}.json`;
-    
+
     const userData: any = {};
-    
+
     // Add all additional fields to the request
     if (additionalFields.admin !== undefined) userData.admin = additionalFields.admin;
     if (additionalFields.auth_source_id !== undefined) userData.auth_source_id = additionalFields.auth_source_id;
     if (additionalFields.mail_notification !== undefined) userData.mail_notification = additionalFields.mail_notification;
     if (additionalFields.must_change_passwd !== undefined) userData.must_change_passwd = additionalFields.must_change_passwd;
     if (additionalFields.status !== undefined) userData.status = additionalFields.status;
-    
+
     // Add custom fields if any
     if (additionalFields.customFields && additionalFields.customFields.field) {
       const customFields: any[] = [];
-      
+
       for (const customField of additionalFields.customFields.field) {
         customFields.push({
           id: customField.id,
           value: customField.value,
         });
       }
-      
+
       if (customFields.length > 0) {
         userData.custom_fields = customFields;
       }
     }
-    
+
     body = {
       user: userData,
     };
@@ -180,32 +180,41 @@ export async function executeUserOperation(
     method = 'DELETE';
     endpoint = `/users/${userId}.json`;
   }
-  
+
+  const optionsData = this.getNodeParameter('options', i, {}) as { impersonateUser?: string };
+  const impersonateUser = optionsData.impersonateUser;
+
+  const headers: any = {
+    'X-Redmine-API-Key': apiKey,
+    'Content-Type': 'application/json',
+  };
+
+  if (impersonateUser) {
+    headers['X-Redmine-Switch-User'] = impersonateUser;
+  }
+
   // Make the request to Redmine API
   const options: IRequestOptions = {
     method,
     body,
     qs,
     uri: `${baseUrl}/` + endpoint.replace(/^\//, ''),
-    headers: {
-      'X-Redmine-API-Key': apiKey,
-      'Content-Type': 'application/json',
-    },
+    headers,
     json: true,
   };
-  
+
   if (Object.keys(body).length === 0) {
     delete options.body;
   }
-  
+
   let responseData;
-  
+
   try {
     responseData = await this.helpers.request(options);
   } catch (error) {
     throw new NodeOperationError(this.getNode(), `Redmine API error: ${error.message}`, { itemIndex: i });
   }
-  
+
   return {
     json: responseData,
     pairedItem: {
