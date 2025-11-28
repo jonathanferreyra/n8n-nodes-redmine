@@ -332,6 +332,17 @@ export async function executeIssueOperation(
     const issueId = this.getNodeParameter('issueId', i) as string;
     method = 'DELETE';
     endpoint = `/issues/${issueId}.json`;
+  } else if (operation === 'addWatcher') {
+    // ----------------------------------
+    //         issue:addWatcher
+    // ----------------------------------
+    const issueId = this.getNodeParameter('issueId', i) as string;
+    const userId = this.getNodeParameter('userId', i) as string;
+    method = 'POST';
+    endpoint = `/issues/${issueId}/watchers.json`;
+    body = {
+      user_id: userId,
+    };
   }
 
   const optionsData = this.getNodeParameter('options', i, {}) as { impersonateUser?: string };

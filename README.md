@@ -22,7 +22,18 @@ To use this node, you need to set up credentials with your Redmine instance:
 
 Manage issues in your Redmine projects.
 
+**Note**: All Issue operations support User Impersonation via the 'Impersonate User' field. This requires the API key to be from an admin user.
+
 #### Operations:
+
+- **Get**: Retrieve a single issue by ID
+- **Get Many**: Retrieve multiple issues with filtering options
+- **Create**: Create a new issue
+- **Update**: Update an existing issue
+- **Delete**: Delete an issue
+- **Add Watcher**: Add a watcher to an issue
+
+#### Operation Details:
 
 - **Get**: Retrieve a single issue by ID
   - Required parameters:
@@ -82,6 +93,11 @@ Manage issues in your Redmine projects.
 - **Delete**: Delete an issue
   - Required parameters:
     - Issue ID
+
+- **Add Watcher**: Add a watcher to an issue
+  - Required parameters:
+    - Issue ID
+    - User ID: The ID of the user to add as a watcher
 
 ### Projects
 

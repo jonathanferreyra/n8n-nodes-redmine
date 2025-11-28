@@ -10,11 +10,25 @@ export const commonFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['issue'],
-        operation: ['get', 'delete', 'update'],
+        operation: ['get', 'delete', 'update', 'addWatcher'],
       },
     },
     default: '',
     description: 'The ID of the issue to get',
+  },
+  {
+    displayName: 'User ID',
+    name: 'userId',
+    type: 'string',
+    required: true,
+    displayOptions: {
+      show: {
+        resource: ['issue'],
+        operation: ['addWatcher'],
+      },
+    },
+    default: '',
+    description: 'The ID of the user to add as a watcher',
   },
   {
     displayName: 'Include',

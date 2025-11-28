@@ -41,6 +41,12 @@ export const issueOperations: INodeProperties[] = [
         description: 'Update an issue',
         action: 'Update an issue',
       },
+      {
+        name: 'Add Watcher',
+        value: 'addWatcher',
+        description: 'Add a watcher to an issue',
+        action: 'Add a watcher to an issue',
+      },
     ],
     default: 'get',
     noDataExpression: true,
