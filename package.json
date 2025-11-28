@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-redmine",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Redmine node for n8n",
   "keywords": [
     "n8n-community-node-package",
