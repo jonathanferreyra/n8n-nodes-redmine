@@ -66,6 +66,7 @@ Manage issues in your Redmine projects.
     - Due Date
     - Estimated Hours
     - Fixed Version ID
+    - Is Private
     - Parent Issue ID
     - Priority ID
     - Start Date

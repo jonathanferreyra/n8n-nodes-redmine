@@ -204,6 +204,7 @@ export async function executeIssueOperation(
       start_date?: string;
       due_date?: string;
       estimated_hours?: number;
+      is_private?: boolean;
       customFields?: {
         field: {
           id: string;
@@ -232,6 +233,7 @@ export async function executeIssueOperation(
     if (additionalFields.start_date) issueData.start_date = additionalFields.start_date;
     if (additionalFields.due_date) issueData.due_date = additionalFields.due_date;
     if (additionalFields.estimated_hours) issueData.estimated_hours = additionalFields.estimated_hours;
+    if (additionalFields.is_private !== undefined) issueData.is_private = additionalFields.is_private;
 
     // Add custom fields if any
     if (additionalFields.customFields && additionalFields.customFields.field) {
@@ -272,6 +274,7 @@ export async function executeIssueOperation(
       start_date?: string;
       due_date?: string;
       estimated_hours?: number;
+      is_private?: boolean;
       customFields?: {
         field: {
           id: string;
@@ -301,6 +304,7 @@ export async function executeIssueOperation(
     if (additionalFields.start_date) issueData.start_date = additionalFields.start_date;
     if (additionalFields.due_date) issueData.due_date = additionalFields.due_date;
     if (additionalFields.estimated_hours) issueData.estimated_hours = additionalFields.estimated_hours;
+    if (additionalFields.is_private !== undefined) issueData.is_private = additionalFields.is_private;
 
     // Add custom fields if any
     if (additionalFields.customFields && additionalFields.customFields.field) {
