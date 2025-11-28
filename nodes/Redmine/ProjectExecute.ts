@@ -18,7 +18,7 @@ export async function executeProjectOperation(
   params: ProjectOperationParams
 ): Promise<INodeExecutionData> {
   const { operation, i, baseUrl, apiKey } = params;
-  
+
   let endpoint: string = '';
   let method: IHttpRequestMethods = 'GET';
   let body: any = {};
@@ -40,13 +40,13 @@ export async function executeProjectOperation(
     const filters = this.getNodeParameter('filters', i) as {
       status?: string;
     };
-    
+
     method = 'GET';
     endpoint = '/projects.json';
-    
+
     // Add filters to query string
     if (filters.status) qs.status = filters.status;
-    
+
     if (!returnAll) {
       const limit = this.getNodeParameter('limit', i) as number;
       qs.limit = limit;
@@ -75,53 +75,53 @@ export async function executeProjectOperation(
         }[];
       };
     };
-    
+
     method = 'POST';
     endpoint = '/projects.json';
-    
+
     const projectData: any = {
       name,
       identifier,
     };
-    
+
     // Add all additional fields to the request
     if (additionalFields.description) projectData.description = additionalFields.description;
     if (additionalFields.homepage) projectData.homepage = additionalFields.homepage;
     if (additionalFields.is_public !== undefined) projectData.is_public = additionalFields.is_public;
     if (additionalFields.parent_id) projectData.parent_id = additionalFields.parent_id;
     if (additionalFields.inherit_members !== undefined) projectData.inherit_members = additionalFields.inherit_members;
-    
+
     // Add custom fields if any
     if (additionalFields.customFields && additionalFields.customFields.field) {
       const customFields: any[] = [];
-      
+
       for (const customField of additionalFields.customFields.field) {
         customFields.push({
           id: customField.id,
           value: customField.value,
         });
       }
-      
+
       if (customFields.length > 0) {
         projectData.custom_fields = customFields;
       }
     }
-    
+
     // Add enabled modules if any
     if (additionalFields.enabledModules && additionalFields.enabledModules.module) {
       const enabledModules: any[] = [];
-      
+
       for (const module of additionalFields.enabledModules.module) {
         enabledModules.push({
           name: module.name,
         });
       }
-      
+
       if (enabledModules.length > 0) {
         projectData.enabled_modules = enabledModules;
       }
     }
-    
+
     body = {
       project: projectData,
     };
@@ -148,50 +148,50 @@ export async function executeProjectOperation(
         }[];
       };
     };
-    
+
     method = 'PUT';
     endpoint = `/projects/${projectId}.json`;
-    
+
     const projectData: any = {};
-    
+
     // Add all additional fields to the request
     if (additionalFields.description !== undefined) projectData.description = additionalFields.description;
     if (additionalFields.homepage !== undefined) projectData.homepage = additionalFields.homepage;
     if (additionalFields.is_public !== undefined) projectData.is_public = additionalFields.is_public;
     if (additionalFields.parent_id !== undefined) projectData.parent_id = additionalFields.parent_id;
     if (additionalFields.inherit_members !== undefined) projectData.inherit_members = additionalFields.inherit_members;
-    
+
     // Add custom fields if any
     if (additionalFields.customFields && additionalFields.customFields.field) {
       const customFields: any[] = [];
-      
+
       for (const customField of additionalFields.customFields.field) {
         customFields.push({
           id: customField.id,
           value: customField.value,
         });
       }
-      
+
       if (customFields.length > 0) {
         projectData.custom_fields = customFields;
       }
     }
-    
+
     // Add enabled modules if any
     if (additionalFields.enabledModules && additionalFields.enabledModules.module) {
       const enabledModules: any[] = [];
-      
+
       for (const module of additionalFields.enabledModules.module) {
         enabledModules.push({
           name: module.name,
         });
       }
-      
+
       if (enabledModules.length > 0) {
         projectData.enabled_modules = enabledModules;
       }
     }
-    
+
     body = {
       project: projectData,
     };
@@ -203,32 +203,41 @@ export async function executeProjectOperation(
     method = 'DELETE';
     endpoint = `/projects/${projectId}.json`;
   }
-  
+
+  const optionsData = this.getNodeParameter('options', i, {}) as { impersonateUser?: string };
+  const impersonateUser = optionsData.impersonateUser;
+
+  const headers: any = {
+    'X-Redmine-API-Key': apiKey,
+    'Content-Type': 'application/json',
+  };
+
+  if (impersonateUser) {
+    headers['X-Redmine-Switch-User'] = impersonateUser;
+  }
+
   // Make the request to Redmine API
   const options: IRequestOptions = {
     method,
     body,
     qs,
     uri: `${baseUrl}/` + endpoint.replace(/^\//, ''),
-    headers: {
-      'X-Redmine-API-Key': apiKey,
-      'Content-Type': 'application/json',
-    },
+    headers,
     json: true,
   };
-  
+
   if (Object.keys(body).length === 0) {
     delete options.body;
   }
-  
+
   let responseData;
-  
+
   try {
     responseData = await this.helpers.request(options);
   } catch (error) {
     throw new NodeOperationError(this.getNode(), `Redmine API error: ${error.message}`, { itemIndex: i });
   }
-  
+
   return {
     json: responseData,
     pairedItem: {
