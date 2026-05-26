@@ -20,7 +20,7 @@ Version minima soportada de Redmine: `5.0`.
 
 ## Stack y comandos
 
-- Runtime minimo: Node.js `>=18.10`.
+- Runtime requerido: Node.js `22.x` (fijado en `.nvmrc`, `.node-version`, `package.json` y `.npmrc`).
 - Package manager esperado: `pnpm@9.1.4`.
 - Lenguaje: TypeScript, CommonJS, salida en `dist/`.
 - Tests unitarios: Vitest.
