@@ -66,6 +66,8 @@ export async function executeIssueOperation(
       qs.include = include.join(',');
     }
 
+    const statusList = this.getNodeParameter('status_list', i, '') as string;
+
     // Get and process all filters
     const filters = this.getNodeParameter('filters', i, {}) as {
       issue_id?: string;
@@ -106,8 +108,10 @@ export async function executeIssueOperation(
     if (filters.subproject_id) qs.subproject_id = filters.subproject_id;
     if (filters.tracker_id) qs.tracker_id = filters.tracker_id;
 
-    // Handle status_id with special options
-    if (filters.status_id) {
+    // Handle status filters. The dynamic status list takes precedence when both are set.
+    if (statusList) {
+      qs.status_id = statusList;
+    } else if (filters.status_id) {
       if (filters.status_id === 'custom' && filters.custom_status_id) {
         qs.status_id = filters.custom_status_id;
       } else {
@@ -192,6 +196,7 @@ export async function executeIssueOperation(
     // ----------------------------------
     const projectId = this.getNodeParameter('projectId', i) as string;
     const subject = this.getNodeParameter('subject', i) as string;
+    const statusList = this.getNodeParameter('status_list', i, '') as string;
     const additionalFields = this.getNodeParameter('additionalFields', i) as {
       description?: string;
       category_id?: string;
@@ -225,6 +230,7 @@ export async function executeIssueOperation(
     if (additionalFields.description) issueData.description = additionalFields.description;
     if (additionalFields.category_id) issueData.category_id = additionalFields.category_id;
     if (additionalFields.status_id) issueData.status_id = additionalFields.status_id;
+    if (statusList) issueData.status_id = statusList;
     if (additionalFields.tracker_id) issueData.tracker_id = additionalFields.tracker_id;
     if (additionalFields.priority_id) issueData.priority_id = additionalFields.priority_id;
     if (additionalFields.assigned_to_id) issueData.assigned_to_id = additionalFields.assigned_to_id;
@@ -262,6 +268,7 @@ export async function executeIssueOperation(
     const subject = this.getNodeParameter('subject', i) as string;
     const notes = this.getNodeParameter('notes', i) as string;
     const privateNotes = this.getNodeParameter('private_notes', i) as string;
+    const statusList = this.getNodeParameter('status_list', i, '') as string;
     const additionalFields = this.getNodeParameter('additionalFields', i) as {
       description?: string;
       category_id?: string;
@@ -296,6 +303,7 @@ export async function executeIssueOperation(
     if (additionalFields.description) issueData.description = additionalFields.description;
     if (additionalFields.category_id) issueData.category_id = additionalFields.category_id;
     if (additionalFields.status_id) issueData.status_id = additionalFields.status_id;
+    if (statusList) issueData.status_id = statusList;
     if (additionalFields.tracker_id) issueData.tracker_id = additionalFields.tracker_id;
     if (additionalFields.priority_id) issueData.priority_id = additionalFields.priority_id;
     if (additionalFields.assigned_to_id) issueData.assigned_to_id = additionalFields.assigned_to_id;

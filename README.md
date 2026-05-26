@@ -6,6 +6,10 @@ This is a custom n8n node that integrates with Redmine, the flexible project man
 
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
+## Development
+
+This project requires Node.js 22.x and pnpm 9.1.4. Run `nvm use` from the repository root before installing dependencies or running scripts.
+
 ## Credentials
 
 To use this node, you need to set up credentials with your Redmine instance:
@@ -60,6 +64,7 @@ Manage issues in your Redmine projects.
     - Priority ID: Filter by priority
     - Project ID: Filter by project
     - Status ID: Filter by status
+    - Status Name or ID: Select a status from Redmine issue statuses
     - Subject: Filter by subject
     - Subproject ID: Filter by subproject
     - Target Version ID: Filter by target version

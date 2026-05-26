@@ -1,9 +1,12 @@
 import {
   IExecuteFunctions,
+  ILoadOptionsFunctions,
   INodeExecutionData,
+  INodePropertyOptions,
   INodeType,
   INodeTypeDescription,
-  NodeConnectionType
+  NodeConnectionType,
+  NodeOperationError,
 } from 'n8n-workflow';
 
 import { issueOperations, issueFields } from './IssueOperations';
@@ -14,6 +17,38 @@ import { userOperations, userFields } from './UserOperations';
 import { executeUserOperation } from './UserExecute';
 
 export class Redmine implements INodeType {
+  methods = {
+    loadOptions: {
+      async getIssueStatuses(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const credentials = await this.getCredentials('redmineApi');
+        const baseUrl = credentials.url as string;
+        const apiKey = credentials.apiKey as string;
+
+        try {
+          const response = await this.helpers.request({
+            method: 'GET',
+            uri: `${baseUrl}/issue_statuses.json`,
+            headers: {
+              'X-Redmine-API-Key': apiKey,
+              'Content-Type': 'application/json',
+            },
+            json: true,
+          }) as { issue_statuses?: Array<{ id: number | string; name: string }> };
+
+          return (response.issue_statuses ?? []).map((status) => ({
+            name: status.name,
+            value: String(status.id),
+          }));
+        } catch (error) {
+          throw new NodeOperationError(
+            this.getNode(),
+            `Redmine API error loading issue statuses: ${error.message}`,
+          );
+        }
+      },
+    },
+  };
+
   description: INodeTypeDescription = {
     displayName: 'Redmine',
     name: 'redmine',

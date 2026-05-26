@@ -44,6 +44,22 @@ export const commonFields: INodeProperties[] = [
     default: [],
     description: 'Associated data to include in the response',
   },
+  {
+    displayName: 'Status Name or ID',
+    name: 'status_list',
+    type: 'options',
+    displayOptions: {
+      show: {
+        resource: ['issue'],
+        operation: ['create', 'update', 'getAll'],
+      },
+    },
+    typeOptions: {
+      loadOptionsMethod: 'getIssueStatuses',
+    },
+    default: '',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>',
+  },
 ];
 
 export const createFields: INodeProperties[] = [

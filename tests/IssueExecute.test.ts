@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { ILoadOptionsFunctions } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
 import { executeIssueOperation } from '../nodes/Redmine/IssueExecute';
+import { Redmine } from '../nodes/Redmine/Redmine.node';
 import { createExecuteContext, getLastRequest } from './helpers';
 
 const baseParams = {
@@ -120,10 +122,82 @@ describe('executeIssueOperation', () => {
 		expect(request).not.toHaveProperty('body');
 	});
 
+	it('uses the selected status list value as the status filter', async () => {
+		const { context, requestMock } = createExecuteContext({
+			returnAll: false,
+			limit: 25,
+			offset: 0,
+			include: [],
+			status_list: '7',
+			filters: {},
+			options: {},
+		});
+
+		await executeIssueOperation.call(context, {
+			...baseParams,
+			operation: 'getAll',
+		});
+		const request = getLastRequest(requestMock);
+
+		expect(request.qs).toMatchObject({
+			status_id: '7',
+		});
+	});
+
+	it('prioritizes status list over the static status filter', async () => {
+		const { context, requestMock } = createExecuteContext({
+			returnAll: false,
+			limit: 25,
+			offset: 0,
+			include: [],
+			status_list: '7',
+			filters: {
+				status_id: 'open',
+			},
+			options: {},
+		});
+
+		await executeIssueOperation.call(context, {
+			...baseParams,
+			operation: 'getAll',
+		});
+		const request = getLastRequest(requestMock);
+
+		expect(request.qs).toMatchObject({
+			status_id: '7',
+		});
+	});
+
+	it('prioritizes status list over custom status ID', async () => {
+		const { context, requestMock } = createExecuteContext({
+			returnAll: false,
+			limit: 25,
+			offset: 0,
+			include: [],
+			status_list: '7',
+			filters: {
+				status_id: 'custom',
+				custom_status_id: '9',
+			},
+			options: {},
+		});
+
+		await executeIssueOperation.call(context, {
+			...baseParams,
+			operation: 'getAll',
+		});
+		const request = getLastRequest(requestMock);
+
+		expect(request.qs).toMatchObject({
+			status_id: '7',
+		});
+	});
+
 	it('creates an issue with additional fields, booleans, and custom fields', async () => {
 		const { context, requestMock } = createExecuteContext({
 			projectId: 'project-a',
 			subject: 'New issue',
+			status_list: '9',
 			additionalFields: {
 				description: 'Details',
 				category_id: '4',
@@ -159,7 +233,7 @@ describe('executeIssueOperation', () => {
 					subject: 'New issue',
 					description: 'Details',
 					category_id: '4',
-					status_id: '1',
+					status_id: '9',
 					tracker_id: '2',
 					priority_id: '3',
 					assigned_to_id: '5',
@@ -181,8 +255,10 @@ describe('executeIssueOperation', () => {
 			subject: 'Updated issue',
 			notes: 'Progress note',
 			private_notes: 'true',
+			status_list: '5',
 			additionalFields: {
 				description: 'Updated details',
+				status_id: '1',
 				is_private: true,
 				customFields: {
 					field: [{ id: '12', value: 'backend' }],
@@ -206,6 +282,7 @@ describe('executeIssueOperation', () => {
 					notes: 'Progress note',
 					private_notes: true,
 					description: 'Updated details',
+					status_id: '5',
 					is_private: true,
 					custom_fields: [{ id: '12', value: 'backend' }],
 				},
@@ -273,4 +350,48 @@ describe('executeIssueOperation', () => {
 	});
 
 	it.todo('paginates all matching issue results when returnAll is true');
+});
+
+describe('Redmine load options', () => {
+	it('loads issue statuses from Redmine', async () => {
+		const requestMock = vi.fn().mockResolvedValue({
+			issue_statuses: [
+				{ id: 1, name: 'New', is_closed: false },
+				{ id: 5, name: 'Resolved', is_closed: false },
+			],
+		});
+		const context = {
+			getCredentials: vi.fn().mockResolvedValue({
+				url: 'https://redmine.example.com',
+				apiKey: 'secret-key',
+			}),
+			helpers: {
+				request: requestMock,
+			},
+			getNode: vi.fn(() => ({
+				id: 'redmine-node',
+				name: 'Redmine',
+				type: 'n8n-nodes-redmine.redmine',
+				typeVersion: 1,
+				position: [0, 0],
+				parameters: {},
+			})),
+		} as unknown as ILoadOptionsFunctions;
+
+		const options = await new Redmine().methods.loadOptions.getIssueStatuses.call(context);
+
+		expect(requestMock).toHaveBeenCalledWith({
+			method: 'GET',
+			uri: 'https://redmine.example.com/issue_statuses.json',
+			headers: {
+				'X-Redmine-API-Key': 'secret-key',
+				'Content-Type': 'application/json',
+			},
+			json: true,
+		});
+		expect(options).toEqual([
+			{ name: 'New', value: '1' },
+			{ name: 'Resolved', value: '5' },
+		]);
+	});
 });
