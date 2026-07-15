@@ -376,7 +376,56 @@ export async function executeIssueOperation(
   let responseData;
 
   try {
-    responseData = await this.helpers.request(options);
+    if (operation === 'getAll' && (this.getNodeParameter('returnAll', i) as boolean)) {
+      const allIssues: any[] = [];
+      const maxItems = this.getNodeParameter('maxItems', i, 1000) as number;
+      const pageSize = 100;
+      let offset = 0;
+      let totalCount = Number.POSITIVE_INFINITY;
+      let reportedTotalCount: number | undefined;
+
+      while (allIssues.length < maxItems && offset < totalCount) {
+        const remainingItems = maxItems - allIssues.length;
+        const pageLimit = Math.min(pageSize, remainingItems);
+
+        const pageOptions: IRequestOptions = {
+          ...options,
+          qs: {
+            ...(options.qs ?? {}),
+            limit: pageLimit,
+            offset,
+          },
+        };
+
+        const pageResponse = await this.helpers.request(pageOptions);
+        const issues = Array.isArray(pageResponse?.issues) ? pageResponse.issues : [];
+        const issuesToAdd = issues.slice(0, remainingItems);
+
+        allIssues.push(...issuesToAdd);
+
+        if (typeof pageResponse?.total_count === 'number') {
+          totalCount = pageResponse.total_count;
+          reportedTotalCount = pageResponse.total_count;
+        } else if (issues.length < pageLimit) {
+          break;
+        }
+
+        if (issues.length === 0) {
+          break;
+        }
+
+        offset += issues.length;
+      }
+
+      responseData = {
+        issues: allIssues,
+        total_count: reportedTotalCount ?? allIssues.length,
+        offset: 0,
+        limit: allIssues.length,
+      };
+    } else {
+      responseData = await this.helpers.request(options);
+    }
   } catch (error) {
     throw new NodeOperationError(this.getNode(), `Redmine API error: ${error.message}`, { itemIndex: i });
   }
