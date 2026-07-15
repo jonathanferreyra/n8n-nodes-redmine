@@ -1,6 +1,7 @@
 node_modules
 .DS_Store
 .tmp
+.atl/
 tmp
 dist
 npm-debug.log*

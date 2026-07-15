@@ -44,10 +44,15 @@ Manage issues in your Redmine projects.
 - **Get Many**: Retrieve multiple issues with filtering options
   - Parameters:
     - Return All (boolean): Whether to return all results or limit
+    - Max Items (number): Maximum number of issues to return when Return All is enabled. Defaults to 1000.
     - Limit (number): Maximum number of results to return when not returning all
     - Offset (number): Number of issues to skip in response
     - Sort (string): Column to sort by. Append :desc to invert the order (e.g., created_on:desc).
     - Include (list): Associated data to include in the response. Options: Attachments, Children, Journals, Relations, Watchers.
+  - Pagination behavior:
+    - When Return All is enabled, the node paginates Redmine internally and returns up to Max Items.
+    - Filters, sort, includes, and custom field filters are preserved across all paginated requests.
+    - The response keeps Redmine's `total_count`, sets `offset` to `0`, and sets `limit` to the number of issues returned by the node.
   - Filters:
     - Assigned To ID: Filter by the assigned user
     - Author ID: Filter by author
@@ -65,6 +70,12 @@ Manage issues in your Redmine projects.
     - Target Version ID: Filter by target version
     - Tracker ID: Filter by tracker
     - Updated On: Filter by updated date. Operations exact, before, after and range
+
+  - Comportamiento de paginación:
+    - Cuando Return All está activo, el nodo pagina internamente contra Redmine y devuelve hasta Max Items.
+    - Max Items tiene un valor por defecto de 1000 y se puede ajustar desde la UI de n8n.
+    - Los filtros, el orden, los includes y los filtros de custom fields se preservan en todas las páginas.
+    - La respuesta conserva el `total_count` de Redmine, usa `offset` en `0` y reporta `limit` como la cantidad de issues devueltos por el nodo.
 
 - **Create**: Create a new issue
   - Required parameters:
