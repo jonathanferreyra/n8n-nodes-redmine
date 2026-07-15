@@ -15,6 +15,23 @@ export const issueGetAllOperations: INodeProperties[] = [
     description: 'Whether to return all results or only up to a given limit',
   },
   {
+    displayName: 'Max Items',
+    name: 'maxItems',
+    type: 'number',
+    displayOptions: {
+      show: {
+        resource: ['issue'],
+        operation: ['getAll'],
+        returnAll: [true],
+      },
+    },
+    typeOptions: {
+      minValue: 1,
+    },
+    default: 1000,
+    description: 'Maximum number of issues to return when returning all results',
+  },
+  {
     displayName: 'Limit',
     name: 'limit',
     type: 'number',

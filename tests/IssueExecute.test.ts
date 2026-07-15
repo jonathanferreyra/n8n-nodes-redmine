@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { NodeOperationError } from 'n8n-workflow';
 
 import { executeIssueOperation } from '../nodes/Redmine/IssueExecute';
+import { issueGetAllOperations } from '../nodes/Redmine/Issue.getAll.Operations';
 import { createExecuteContext, getLastRequest } from './helpers';
 
 const baseParams = {
@@ -11,6 +12,27 @@ const baseParams = {
 };
 
 describe('executeIssueOperation', () => {
+	it('shows Max Items only for issue getAll returnAll mode', () => {
+		const maxItemsProperty = issueGetAllOperations.find((property) => property.name === 'maxItems');
+
+		expect(maxItemsProperty).toMatchObject({
+			displayName: 'Max Items',
+			name: 'maxItems',
+			type: 'number',
+			displayOptions: {
+				show: {
+					resource: ['issue'],
+					operation: ['getAll'],
+					returnAll: [true],
+				},
+			},
+			typeOptions: {
+				minValue: 1,
+			},
+			default: 1000,
+		});
+	});
+
 	it('gets an issue with includes, headers, impersonation, json, and paired item', async () => {
 		const responseData = { issue: { id: 123 } };
 		const { context, requestMock } = createExecuteContext(
@@ -272,5 +294,207 @@ describe('executeIssueOperation', () => {
 		).rejects.toBeInstanceOf(NodeOperationError);
 	});
 
-	it.todo('paginates all matching issue results when returnAll is true');
+	it('paginates all matching issue results when returnAll is true using the default maxItems cap', async () => {
+		const pageIssues = Array.from({ length: 100 }, (_, index) => ({ id: index + 1 }));
+		const { context, requestMock } = createExecuteContext({
+			returnAll: true,
+			sort: '',
+			include: [],
+			filters: {},
+			options: {},
+		});
+
+		for (let page = 0; page < 10; page++) {
+			requestMock.mockResolvedValueOnce({
+				issues: pageIssues.map((issue) => ({ id: issue.id + page * 100 })),
+				total_count: 1100,
+				offset: page * 100,
+				limit: 100,
+			});
+		}
+
+		const result = await executeIssueOperation.call(context, {
+			...baseParams,
+			operation: 'getAll',
+		});
+
+		expect(requestMock).toHaveBeenCalledTimes(10);
+		expect(requestMock.mock.calls[9][0]).toMatchObject({
+			qs: {
+				limit: 100,
+				offset: 900,
+			},
+		});
+		expect(result.json).toMatchObject({
+			total_count: 1100,
+			offset: 0,
+			limit: 1000,
+		});
+		expect((result.json as { issues: unknown[] }).issues).toHaveLength(1000);
+	});
+
+	it('paginates all matching issue results when returnAll is true without exceeding configurable maxItems', async () => {
+		const { context, requestMock } = createExecuteContext({
+			returnAll: true,
+			maxItems: 125,
+			sort: 'created_on:desc',
+			include: ['watchers'],
+			filters: {
+				project_id: 'project-a',
+				status_id: 'open',
+				customFields: {
+					field: [{ id: '12', value: 'frontend' }],
+				},
+			},
+			options: {},
+		});
+
+		requestMock
+			.mockResolvedValueOnce({
+				issues: Array.from({ length: 100 }, (_, index) => ({ id: index + 1 })),
+				total_count: 300,
+				offset: 0,
+				limit: 100,
+			})
+			.mockResolvedValueOnce({
+				issues: Array.from({ length: 25 }, (_, index) => ({ id: index + 101 })),
+				total_count: 300,
+				offset: 100,
+				limit: 25,
+			});
+
+		const result = await executeIssueOperation.call(context, {
+			...baseParams,
+			operation: 'getAll',
+		});
+
+		expect(requestMock).toHaveBeenCalledTimes(2);
+		expect(requestMock.mock.calls[0][0]).toMatchObject({
+			method: 'GET',
+			uri: 'https://redmine.example.com/issues.json',
+			qs: {
+				limit: 100,
+				offset: 0,
+				sort: 'created_on:desc',
+				include: 'watchers',
+				project_id: 'project-a',
+				status_id: 'open',
+				cf_12: 'frontend',
+			},
+		});
+		expect(requestMock.mock.calls[1][0]).toMatchObject({
+			qs: {
+				limit: 25,
+				offset: 100,
+				sort: 'created_on:desc',
+				include: 'watchers',
+				project_id: 'project-a',
+				status_id: 'open',
+				cf_12: 'frontend',
+			},
+		});
+		expect(result.json).toMatchObject({
+			total_count: 300,
+			offset: 0,
+			limit: 125,
+		});
+		expect((result.json as { issues: unknown[] }).issues).toHaveLength(125);
+		expect(result.pairedItem).toEqual({ item: 0 });
+	});
+
+	it('reports aggregated limit as maxItems for returnAll when internal requests use a final remainder', async () => {
+		const { context, requestMock } = createExecuteContext({
+			returnAll: true,
+			maxItems: 130,
+			sort: '',
+			include: [],
+			filters: {},
+			options: {},
+		});
+
+		requestMock
+			.mockResolvedValueOnce({
+				issues: Array.from({ length: 100 }, (_, index) => ({ id: index + 1 })),
+				total_count: 7624,
+				offset: 0,
+				limit: 100,
+			})
+			.mockResolvedValueOnce({
+				issues: Array.from({ length: 30 }, (_, index) => ({ id: index + 101 })),
+				total_count: 7624,
+				offset: 100,
+				limit: 30,
+			});
+
+		const result = await executeIssueOperation.call(context, {
+			...baseParams,
+			operation: 'getAll',
+		});
+
+		expect(requestMock).toHaveBeenCalledTimes(2);
+		expect(requestMock.mock.calls[0][0]).toMatchObject({
+			qs: {
+				limit: 100,
+				offset: 0,
+			},
+		});
+		expect(requestMock.mock.calls[1][0]).toMatchObject({
+			qs: {
+				limit: 30,
+				offset: 100,
+			},
+		});
+		expect(result.json).toMatchObject({
+			total_count: 7624,
+			offset: 0,
+			limit: 130,
+		});
+		expect((result.json as { issues: unknown[] }).issues).toHaveLength(130);
+	});
+
+	it('stops paginating issue results when Redmine returns an empty page', async () => {
+		const firstPageIssues = Array.from({ length: 100 }, (_, index) => ({ id: index + 1 }));
+		const { context, requestMock } = createExecuteContext({
+			returnAll: true,
+			maxItems: 1000,
+			sort: '',
+			include: [],
+			filters: {},
+			options: {},
+		});
+
+		requestMock
+			.mockResolvedValueOnce({
+				issues: firstPageIssues,
+				offset: 0,
+				limit: 100,
+			})
+			.mockResolvedValueOnce({
+				issues: [],
+				offset: 1,
+				limit: 100,
+			});
+
+		const result = await executeIssueOperation.call(context, {
+			...baseParams,
+			operation: 'getAll',
+		});
+
+		expect(requestMock).toHaveBeenCalledTimes(2);
+		expect(requestMock.mock.calls[1][0]).toMatchObject({
+			qs: {
+				limit: 100,
+				offset: 100,
+			},
+		});
+		expect(result).toEqual({
+			json: {
+				issues: firstPageIssues,
+				total_count: 100,
+				offset: 0,
+				limit: 100,
+			},
+			pairedItem: { item: 0 },
+		});
+	});
 });
